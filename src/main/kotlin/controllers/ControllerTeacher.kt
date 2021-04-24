@@ -169,47 +169,65 @@ class ControllerTeacher {
 
     @FXML
     private var table_teacher: TableView<Teacher>? = null
+
     @FXML
     private var table_teacher_second: TableColumn<Teacher, String>? = null
+
     @FXML
     private var table_teacher_first: TableColumn<Teacher, String>? = null
+
     @FXML
     private var table_teacher_middle: TableColumn<Teacher, String>? = null
+
     @FXML
     private var table_teacher_subject: TableColumn<Subject, String>? = null
 
 
     @FXML
     private var btn_show_alc1: Button? = null
+
     @FXML
     private var feld_show_alc1: TextField? = null
+
     @FXML
     private var reg_teacher_first: TextField? = null
+
     @FXML
     private var reg_teacher_second: TextField? = null
+
     @FXML
     private var reg_teacher_middle: TextField? = null
+
     @FXML
     private var btn_reg_teacher: Button? = null
+
     @FXML
     private var btn_teacher_back: Button? = null
 
     @FXML
     private var table_teacher_sb: TableView<TeacherSubjects>? = null
+
     @FXML
     private var table_teacher_sb_name_teacher: TableColumn<TeacherSubjects, String>? = null
+
     @FXML
     private var table_teacher_sb_group: TableColumn<Subject, String>? = null
+
     @FXML
     private var table_teacher_sb_subject: TableColumn<Subject, String>? = null
+
     @FXML
     private var teacher_search_first: TextField? = null
+
     @FXML
     private var teacher_search_second: TextField? = null
+
     @FXML
     private var teacher_search_middle: TextField? = null
+
     @FXML
     private var btn_search_teacher: Button? = null
+
     @FXML
     private var teacher_switch_subject: ComboBox<*>? = null
 
@@ -228,19 +246,58 @@ class ControllerTeacher {
         // client = connection?.let { Utils.getClientByLogin(it, user.login) }
         if (connection != null) {
             initTables(connection)
+            initButtons(connection)
         }
+    }
+
+    private fun initButtons(connection: Connection) {
+        btn_teacher_sb_clean?.setOnAction {
+            table_teacher_sb?.items?.clear()
+        }
+        btn_search_teacher?.setOnAction {
+            if (!teacher_search_first?.text.isNullOrBlank() || !teacher_search_second?.text.isNullOrBlank() || !teacher_search_middle?.text.isNullOrBlank()) {
+                tableTeacherFiller(
+                    Utils.findTeacher(
+                        connection,
+                        teacher_search_second!!.text,
+                        teacher_search_first!!.text,
+                        teacher_search_middle!!.text
+                    )
+                )
+            }
+        }
+        btn_reg_teacher?.setOnAction {
+            if (!reg_teacher_first?.text.isNullOrBlank() && !reg_teacher_second?.text.isNullOrBlank() && !reg_teacher_middle?.text.isNullOrBlank()) {
+                createTeacher(
+                    connection,
+                    Teacher(reg_teacher_second?.text, reg_teacher_first?.text, reg_teacher_middle?.text)
+                ) {
+                    if (it) {
+                        tableTeacherFiller(Utils.getTeacherList(connection))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createTeacher(connection: Connection, teacher: Teacher, action: (res: Boolean) -> Unit) {
+        action(Utils.createTeacher(connection, teacher))
+
     }
 
 
     private fun initTables(connection: Connection) {
 
-        var data = mutableListOf<Teacher>()
+        tableTeacher(connection)
+        tableTeacherFiller(Utils.getTeacherList(connection))
 
-        table_teacher?.items?.clear()
-        Utils.getTeacherList(connection)?.let { data.addAll(it) }
-        table_teacher?.items?.addAll(data)
+        table_teacher_sb_name_teacher?.cellValueFactory = PropertyValueFactory("secondName")
+        table_teacher_sb_group?.cellValueFactory = PropertyValueFactory("groupName")
+        table_teacher_sb_subject?.cellValueFactory = PropertyValueFactory("subject")
+    }
 
-        // created teacher table
+    private fun tableTeacher(connection: Connection) {
+
         table_teacher_second?.cellValueFactory = PropertyValueFactory("secondName")
         table_teacher_first?.cellValueFactory = PropertyValueFactory("firstName")
         table_teacher_middle?.cellValueFactory = PropertyValueFactory("middleName")
@@ -249,10 +306,15 @@ class ControllerTeacher {
 
             showTeacherSubjects(connection, it)
         })
+    }
 
-        table_teacher_sb_name_teacher?.cellValueFactory = PropertyValueFactory("secondName")
-        table_teacher_sb_group?.cellValueFactory = PropertyValueFactory("groupName")
-        table_teacher_sb_subject?.cellValueFactory = PropertyValueFactory("subject")
+    private fun tableTeacherFiller(data: List<Teacher>?) {
+        if (data != null) {
+            table_teacher?.items?.clear()
+            table_teacher?.items?.addAll(data)
+            println("Teachers sb is ${data}")
+
+        }
     }
 
     private fun showTeacherSubjects(connection: Connection, id: Teacher) {
@@ -260,7 +322,6 @@ class ControllerTeacher {
         table_teacher_sb?.items?.clear()
         id.idTeacher?.let { Utils.getTeacherSubjectAndGroups(connection, it)?.let { data.addAll(it) } }
         table_teacher_sb?.items?.addAll(data)
-        println("Teachers sb is ${data}")
 
     }
 

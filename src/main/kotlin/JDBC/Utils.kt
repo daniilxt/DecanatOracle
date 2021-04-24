@@ -26,8 +26,7 @@ object Utils {
         return connection
     }
 
-    fun getTeacherList(connection: Connection): List<Teacher>? {
-        val sql = "select * from teachers_with_marks"
+    fun getTeacherList(connection: Connection, sql: String = "select * from teachers_with_marks"): List<Teacher>? {
         try {
             val resultSet = connection.createStatement().executeQuery(sql)
             return if (!resultSet.next()) {
@@ -36,7 +35,7 @@ object Utils {
                 getFromResultSet(resultSet) {
                     Teacher(
                         resultSet.getString("LAST_NAME"), resultSet.getString("FIRST_NAME"),
-                        resultSet.getString("PATHER_NAME"),resultSet.getString("NAME"),resultSet.getLong("ID")
+                        resultSet.getString("PATHER_NAME"), resultSet.getString("NAME"), resultSet.getLong("ID")
                     )
                 }
             }
@@ -47,7 +46,7 @@ object Utils {
     }
 
 
-    fun getTeacherSubjectAndGroups(connection: Connection, teacherId:Long): List<TeacherSubjects>? {
+    fun getTeacherSubjectAndGroups(connection: Connection, teacherId: Long): List<TeacherSubjects>? {
         val sql = "\n" +
                 "select distinct (SELECT p.last_name FROM people p  WHERE P.ID = $teacherId ) AS LAST_NAME,  G.name as GR_NAME  , S.name as SB_NAME," +
                 "substr(g.name, -4, 4) as year\n" +
@@ -64,7 +63,9 @@ object Utils {
             } else {
                 getFromResultSet(resultSet) {
                     TeacherSubjects(
-                        resultSet.getString("LAST_NAME"), groupName = resultSet.getString("GR_NAME"), subject = resultSet.getString("SB_NAME")
+                        resultSet.getString("LAST_NAME"),
+                        groupName = resultSet.getString("GR_NAME"),
+                        subject = resultSet.getString("SB_NAME")
                     )
                 }
             }
@@ -74,6 +75,40 @@ object Utils {
         return null
     }
 
+
+    fun findTeacher(
+        connection: Connection,
+        secondName: String = "",
+        firstName: String = "",
+        middleName: String = ""
+    ): List<Teacher>? {
+        val sql =
+            "select p.last_name as LAST_NAME, p.first_name as FIRST_NAME, p.pather_name as PATHER_NAME," +
+                    " p.first_name as  NAME,p.id as ID\n" +
+                    "from people p\n" +
+                    "where lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
+                    "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
+                    "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'"
+        println("SQL QERY IS  ${sql}")
+        return getTeacherList(connection, sql)
+    }
+
+
+    fun createTeacher(connection: Connection, teacher: Teacher): Boolean {
+        val sql = "insert into people (FIRST_NAME, LAST_NAME, PATHER_NAME, GROUP_ID, TYPE)\n" +
+                "values ('${teacher.firstName}','${teacher.secondName}','${teacher.middleName}',null,'T')\n"
+        return createSomething(connection, sql)
+    }
+
+    private fun createSomething(connection: Connection, sql: String): Boolean {
+        return try {
+            connection.createStatement().executeQuery(sql)
+            true
+        } catch (ex: SQLException) {
+            println(ex)
+            false
+        }
+    }
 
     @Throws(SQLException::class)
     private fun <T> getFromResultSet(resultSet: ResultSet, action: () -> T): List<T>? {
