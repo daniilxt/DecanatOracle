@@ -282,7 +282,6 @@ class ControllerTeacher {
 
     private fun createTeacher(connection: Connection, teacher: Teacher, action: (res: Boolean) -> Unit) {
         action(Utils.createTeacher(connection, teacher))
-
     }
 
 
@@ -302,10 +301,25 @@ class ControllerTeacher {
         table_teacher_first?.cellValueFactory = PropertyValueFactory("firstName")
         table_teacher_middle?.cellValueFactory = PropertyValueFactory("middleName")
         table_teacher_subject?.cellValueFactory = PropertyValueFactory("subject")
-        table_teacher?.columns?.add(addButtonColumn("Action", "handle") {
+        table_teacher?.columns?.add(addButtonColumn("Action", "show") {
 
             showTeacherSubjects(connection, it)
         })
+        table_teacher?.columns?.add(addButtonColumn("Action", "del") {
+
+            deleteTeacher(connection, it)
+        })
+    }
+
+    private fun deleteTeacher(connection: Connection, teacher: Teacher) {
+        teacher.idTeacher?.let { res ->
+            Utils.deleteTeacher(connection, res) {
+                if (!it) {
+                    alert("Teacher has links")
+                }
+                tableTeacherFiller(Utils.getTeacherList(connection))
+            }
+        }
     }
 
     private fun tableTeacherFiller(data: List<Teacher>?) {

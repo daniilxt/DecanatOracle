@@ -1,6 +1,5 @@
 package JDBC
 
-import poko.Subject
 import poko.Teacher
 import poko.TeacherSubjects
 import java.sql.*
@@ -89,7 +88,6 @@ object Utils {
                     "where lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
                     "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
                     "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'"
-        println("SQL QERY IS  ${sql}")
         return getTeacherList(connection, sql)
     }
 
@@ -97,10 +95,10 @@ object Utils {
     fun createTeacher(connection: Connection, teacher: Teacher): Boolean {
         val sql = "insert into people (FIRST_NAME, LAST_NAME, PATHER_NAME, GROUP_ID, TYPE)\n" +
                 "values ('${teacher.firstName}','${teacher.secondName}','${teacher.middleName}',null,'T')\n"
-        return createSomething(connection, sql)
+        return doSomethingWithResult(connection, sql)
     }
 
-    private fun createSomething(connection: Connection, sql: String): Boolean {
+    private fun doSomethingWithResult(connection: Connection, sql: String): Boolean {
         return try {
             connection.createStatement().executeQuery(sql)
             true
@@ -108,6 +106,11 @@ object Utils {
             println(ex)
             false
         }
+    }
+
+    fun deleteTeacher(connection: Connection, idTeacher: Long, action: (res: Boolean) -> Unit) {
+        val sql = "DELETE FROM PEOPLE  P WHERE P.ID = $idTeacher AND P.TYPE = 'T' "
+        action(doSomethingWithResult(connection, sql))
     }
 
     @Throws(SQLException::class)
