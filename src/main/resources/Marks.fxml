@@ -175,7 +175,7 @@
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <TableView fx:id="table_lc_list1" layoutX="29.0" layoutY="175.0" prefHeight="377.0" prefWidth="647.0">
+                        <TableView fx:id="table_marks" layoutX="29.0" layoutY="175.0" prefHeight="377.0" prefWidth="647.0">
                            <columns>
                               <TableColumn fx:id="mk_st_second" prefWidth="73.0" text="secondName" />
                               <TableColumn fx:id="mk_st_first" prefWidth="75.0" text="firstName" />

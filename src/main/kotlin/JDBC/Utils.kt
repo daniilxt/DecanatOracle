@@ -1,5 +1,6 @@
 package JDBC
 
+import poko.Marks
 import poko.Teacher
 import poko.TeacherSubjects
 import java.sql.*
@@ -111,6 +112,49 @@ object Utils {
     fun deleteTeacher(connection: Connection, idTeacher: Long, action: (res: Boolean) -> Unit) {
         val sql = "DELETE FROM PEOPLE  P WHERE P.ID = $idTeacher AND P.TYPE = 'T' "
         action(doSomethingWithResult(connection, sql))
+    }
+
+    fun getFullMarksList(connection: Connection): List<Marks>? {
+        val sql = "select p.last_name,\n" +
+                "       p.first_name,\n" +
+                "       p.pather_name,\n" +
+                "       g.name        as GR_NAME,\n" +
+                "       pt.last_name  as TEACHER_LAST_NAME,\n" +
+                "       pt.first_name  as TEACHER_FIRST_NAME,\n" +
+                "       pt.pather_name as TEACHER_PATHER_NAME,\n" +
+                "       s.name        as SB_NAME,\n" +
+                "       marks.value\n" +
+                "from marks\n" +
+                "         join subjects s on marks.subject_id = s.id\n" +
+                "         join people p on marks.student_id = p.id\n" +
+                "         join people pt on marks.teacher_id = pt.id\n" +
+                "         join groups g on g.id = p.group_id"
+        try {
+            val resultSet = connection.createStatement().executeQuery(sql)
+            return if (!resultSet.next()) {
+                null
+            } else {
+               getFromResultSet(resultSet) {
+                    Marks(
+                        null,
+                        resultSet.getString("LAST_NAME"),
+                        resultSet.getString("FIRST_NAME"),
+                        resultSet.getString("PATHER_NAME"),
+                        resultSet.getString("GR_NAME"),
+                        resultSet.getString("TEACHER_LAST_NAME"),
+                        resultSet.getString("TEACHER_FIRST_NAME"),
+                        resultSet.getString("TEACHER_PATHER_NAME"),
+                        resultSet.getString("SB_NAME"),
+                        null,
+                        null,
+                        resultSet.getLong("VALUE")
+                    )
+                }
+            }
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return null
     }
 
     @Throws(SQLException::class)

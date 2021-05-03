@@ -7,6 +7,7 @@ import javafx.fxml.FXML
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.util.Callback
+import poko.Marks
 import poko.Subject
 import poko.Teacher
 import poko.TeacherSubjects
@@ -102,34 +103,34 @@ class ControllerTeacher {
     private var btn_create_give: Button? = null
 
     @FXML
-    private var table_lc_list1: TableView<*>? = null
+    private var table_marks: TableView<Marks>? = null
 
     @FXML
-    private var mk_st_second: TableColumn<*, *>? = null
+    private var mk_st_second: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_st_first: TableColumn<*, *>? = null
+    private var mk_st_first: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_st_middle: TableColumn<*, *>? = null
+    private var mk_st_middle: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_st_group: TableColumn<*, *>? = null
+    private var mk_st_group: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_teacher_second: TableColumn<*, *>? = null
+    private var mk_teacher_second: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_teacher_first: TableColumn<*, *>? = null
+    private var mk_teacher_first: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_teacher_middle: TableColumn<*, *>? = null
+    private var mk_teacher_middle: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_subject: TableColumn<*, *>? = null
+    private var mk_subject: TableColumn<Marks, String>? = null
 
     @FXML
-    private var mk_value: TableColumn<*, *>? = null
+    private var mk_value: TableColumn<Marks, Long>? = null
 
     @FXML
     private var btn_show_task: Button? = null
@@ -278,6 +279,10 @@ class ControllerTeacher {
                 }
             }
         }
+
+        btn_create_give?.setOnAction {
+            println("WELCOME TO MARKS")
+        }
     }
 
     private fun createTeacher(connection: Connection, teacher: Teacher, action: (res: Boolean) -> Unit) {
@@ -290,10 +295,17 @@ class ControllerTeacher {
         tableTeacher(connection)
         tableTeacherFiller(Utils.getTeacherList(connection))
 
+        tableMarks(connection)
+        val mk = Utils.getFullMarksList(connection)
+        print(mk)
+        tableMarksFiller(mk)
+
         table_teacher_sb_name_teacher?.cellValueFactory = PropertyValueFactory("secondName")
         table_teacher_sb_group?.cellValueFactory = PropertyValueFactory("groupName")
         table_teacher_sb_subject?.cellValueFactory = PropertyValueFactory("subject")
     }
+
+    /*Teacher--------------------------------------------------------------------*/
 
     private fun tableTeacher(connection: Connection) {
 
@@ -326,7 +338,7 @@ class ControllerTeacher {
         if (data != null) {
             table_teacher?.items?.clear()
             table_teacher?.items?.addAll(data)
-            println("Teachers sb is ${data}")
+            // println("Teachers sb is ${data}")
 
         }
     }
@@ -338,6 +350,37 @@ class ControllerTeacher {
         table_teacher_sb?.items?.addAll(data)
 
     }
+    /*Teacher--------------------------------------------------------------------*/
+
+    /*MARKS LIST--------------------------------------------------------------------*/
+
+    private fun tableMarks(connection: Connection) {
+
+        mk_st_second?.cellValueFactory = PropertyValueFactory("stSecondName")
+        mk_st_first?.cellValueFactory = PropertyValueFactory("stFirstName")
+        mk_st_middle?.cellValueFactory = PropertyValueFactory("stMiddleName")
+        mk_st_group?.cellValueFactory = PropertyValueFactory("group")
+        mk_teacher_second?.cellValueFactory = PropertyValueFactory("thSecondName")
+        mk_teacher_first?.cellValueFactory = PropertyValueFactory("thFirstName")
+        mk_teacher_middle?.cellValueFactory = PropertyValueFactory("thMiddleName")
+        mk_subject?.cellValueFactory = PropertyValueFactory("subject")
+        mk_value?.cellValueFactory = PropertyValueFactory("value")
+        table_marks?.columns?.add(addButtonColumn("Action", "show") {
+
+        })
+        table_marks?.columns?.add(addButtonColumn("Action", "del") {
+
+        })
+    }
+
+    private fun tableMarksFiller(data: List<Marks>?) {
+        if (data != null) {
+            table_marks?.items?.clear()
+            table_marks?.items?.addAll(data)
+            println("Marks  is ${data}")
+        }
+    }
+    /*MARKS LIST--------------------------------------------------------------------*/
 
     fun onTeacherAction(actionEvent: ActionEvent) {
 
