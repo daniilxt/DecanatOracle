@@ -203,19 +203,19 @@
                         </Button>
                         <AnchorPane layoutX="926.0" layoutY="160.0" prefHeight="408.0" prefWidth="351.0" style="-fx-background-color: #A1C64F; -fx-background-radius: 20 20 20 20;">
                            <children>
-                              <TextField fx:id="reg_name11" layoutX="150.0" layoutY="72.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter name" style="-fx-background-radius: 8 8 8 8;">
+                              <TextField fx:id="mk_name_search" layoutX="150.0" layoutY="72.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter name" style="-fx-background-radius: 8 8 8 8;">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </TextField>
                               <Label layoutX="30.0" layoutY="78.0" text="FIRST NAME" />
-                              <TextField fx:id="reg_second_name11" layoutX="150.0" layoutY="111.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter second name" style="-fx-background-radius: 8 8 8 8;">
+                              <TextField fx:id="mk_second_name_search" layoutX="150.0" layoutY="111.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter second name" style="-fx-background-radius: 8 8 8 8;">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </TextField>
                               <Label layoutX="30.0" layoutY="111.0" prefHeight="29.0" prefWidth="108.0" text="SECOND NAME" />
-                              <TextField fx:id="reg_middle_name11" layoutX="150.0" layoutY="150.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
+                              <TextField fx:id="mk_middle_name_search" layoutX="150.0" layoutY="150.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
@@ -233,13 +233,13 @@
                               </Button>
                               <Label layoutX="30.0" layoutY="199.0" text="GROUP" />
                               <ComboBox fx:id="switch_mk_group" layoutX="142.0" layoutY="195.0" prefWidth="150.0" promptText="Engineer" />
-                              <TextField fx:id="reg_middle_name111" layoutX="121.0" layoutY="245.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
+                              <TextField fx:id="mk_from_search" layoutX="121.0" layoutY="245.0" prefHeight="29.0" prefWidth="144.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </TextField>
                               <Label layoutX="30.0" layoutY="251.0" text="YEAR FROM" />
-                              <TextField fx:id="reg_middle_name1111" layoutX="121.0" layoutY="284.0" prefHeight="29.0" prefWidth="145.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
+                              <TextField fx:id="mk_to_search" layoutX="121.0" layoutY="284.0" prefHeight="29.0" prefWidth="145.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
                                  <font>
                                     <Font size="13.0" />
                                  </font>

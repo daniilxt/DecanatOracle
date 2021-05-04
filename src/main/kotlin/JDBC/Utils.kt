@@ -114,8 +114,9 @@ object Utils {
         action(doSomethingWithResult(connection, sql))
     }
 
-    fun getFullMarksList(connection: Connection): List<Marks>? {
-        val sql = "select p.last_name,\n" +
+    fun getFullMarksList(
+        connection: Connection,
+        sql: String = "select marks.id as ID_MARK, p.last_name,\n" +
                 "       p.first_name,\n" +
                 "       p.pather_name,\n" +
                 "       g.name        as GR_NAME,\n" +
@@ -129,14 +130,15 @@ object Utils {
                 "         join people p on marks.student_id = p.id\n" +
                 "         join people pt on marks.teacher_id = pt.id\n" +
                 "         join groups g on g.id = p.group_id"
+    ): List<Marks>? {
         try {
             val resultSet = connection.createStatement().executeQuery(sql)
             return if (!resultSet.next()) {
                 null
             } else {
-               getFromResultSet(resultSet) {
+                getFromResultSet(resultSet) {
                     Marks(
-                        null,
+                        resultSet.getLong("ID_MARK"),
                         resultSet.getString("LAST_NAME"),
                         resultSet.getString("FIRST_NAME"),
                         resultSet.getString("PATHER_NAME"),
@@ -155,6 +157,42 @@ object Utils {
             println(ex)
         }
         return null
+    }
+
+    fun getFilteredFullMarksList(
+        connection: Connection,
+        secondName: String = "",
+        firstName: String = "",
+        middleName: String = "",
+        groupName: String = "",
+        year_from: Long = 0,
+        year_to: Long = 3000
+    ): List<Marks>? {
+        val sql = "select marks.id as ID_MARK, p.last_name,\n" +
+                "       p.first_name,\n" +
+                "       p.pather_name,\n" +
+                "       g.name        as GR_NAME,\n" +
+                "       pt.last_name  as TEACHER_LAST_NAME,\n" +
+                "       pt.first_name  as TEACHER_FIRST_NAME,\n" +
+                "       pt.pather_name as TEACHER_PATHER_NAME,\n" +
+                "       s.name        as SB_NAME,\n" +
+                "       marks.value\n" +
+                "from marks\n" +
+                "         join subjects s on marks.subject_id = s.id\n" +
+                "         join people p on marks.student_id = p.id\n" +
+                "         join people pt on marks.teacher_id = pt.id\n" +
+                "         join groups g on g.id = p.group_id" +
+                " where lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
+                "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
+                "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'\n" +
+                "  and g.name like '%${groupName.toLowerCase()}%'\n" +
+                "  and TO_NUMBER(substr(g.name, -4, 4)) between '$year_from' and '$year_to'" +
+                "order by marks.id"
+        return getFullMarksList(connection, sql)
+    }
+
+    fun deleteMark(connection: Connection, id: Long?) {
+
     }
 
     @Throws(SQLException::class)

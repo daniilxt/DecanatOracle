@@ -136,13 +136,13 @@ class ControllerTeacher {
     private var btn_show_task: Button? = null
 
     @FXML
-    private var reg_name11: TextField? = null
+    private var mk_name_search: TextField? = null
 
     @FXML
-    private var reg_second_name11: TextField? = null
+    private var mk_second_name_search: TextField? = null
 
     @FXML
-    private var reg_middle_name11: TextField? = null
+    private var mk_middle_name_search: TextField? = null
 
     @FXML
     private var btn_mk_search: Button? = null
@@ -151,10 +151,10 @@ class ControllerTeacher {
     private var switch_mk_group: ComboBox<*>? = null
 
     @FXML
-    private var reg_middle_name111: TextField? = null
+    private var mk_from_search: TextField? = null
 
     @FXML
-    private var reg_middle_name1111: TextField? = null
+    private var mk_to_search: TextField? = null
 
     @FXML
     private var feld_show_task: TextField? = null
@@ -182,7 +182,6 @@ class ControllerTeacher {
 
     @FXML
     private var table_teacher_subject: TableColumn<Subject, String>? = null
-
 
     @FXML
     private var btn_show_alc1: Button? = null
@@ -231,7 +230,6 @@ class ControllerTeacher {
 
     @FXML
     private var teacher_switch_subject: ComboBox<*>? = null
-
 
     @FXML
     private fun alert(str: String = "Incorrect input", type: Alert.AlertType = Alert.AlertType.ERROR) {
@@ -283,6 +281,18 @@ class ControllerTeacher {
         btn_create_give?.setOnAction {
             println("WELCOME TO MARKS")
         }
+        btn_mk_search?.setOnAction {
+            if (!mk_name_search?.text.isNullOrBlank() || !mk_second_name_search?.text.isNullOrBlank() ||
+                !mk_middle_name_search?.text.isNullOrBlank() || !mk_from_search?.text.isNullOrBlank()
+                || !mk_to_search?.text.isNullOrBlank()
+            ) {
+                tableMarksFiller(
+                    Utils.getFilteredFullMarksList(
+                        connection, mk_second_name_search!!.text, mk_name_search!!.text, mk_middle_name_search!!.text
+                    )
+                )
+            }
+        }
     }
 
     private fun createTeacher(connection: Connection, teacher: Teacher, action: (res: Boolean) -> Unit) {
@@ -296,8 +306,8 @@ class ControllerTeacher {
         tableTeacherFiller(Utils.getTeacherList(connection))
 
         tableMarks(connection)
-        val mk = Utils.getFullMarksList(connection)
-        print(mk)
+        //val mk = Utils.getFullMarksList(connection)
+        val mk = Utils.getFilteredFullMarksList(connection)
         tableMarksFiller(mk)
 
         table_teacher_sb_name_teacher?.cellValueFactory = PropertyValueFactory("secondName")
@@ -365,19 +375,21 @@ class ControllerTeacher {
         mk_teacher_middle?.cellValueFactory = PropertyValueFactory("thMiddleName")
         mk_subject?.cellValueFactory = PropertyValueFactory("subject")
         mk_value?.cellValueFactory = PropertyValueFactory("value")
-        table_marks?.columns?.add(addButtonColumn("Action", "show") {
-
-        })
         table_marks?.columns?.add(addButtonColumn("Action", "del") {
-
+            deleteMark(connection, it)
         })
+    }
+
+    private fun deleteMark(connection: Connection, it: Marks) {
+        println("DELETED MARKS ${it.id}")
+        //   Utils.deleteMark(connection,it.id)
     }
 
     private fun tableMarksFiller(data: List<Marks>?) {
         if (data != null) {
             table_marks?.items?.clear()
             table_marks?.items?.addAll(data)
-            println("Marks  is ${data}")
+            //println("Marks  is ${data}")
         }
     }
     /*MARKS LIST--------------------------------------------------------------------*/
