@@ -57,12 +57,12 @@
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                             <children>
-                                <Button fx:id="btn_create_alc_task" layoutX="779.0" layoutY="565.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="99.0" text="CLEAR">
+                                <Button fx:id="btn_gr_clean_people" layoutX="835.0" layoutY="565.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="99.0" text="CLEAR">
                                     <font>
                                         <Font size="16.0" />
                                     </font>
                                 </Button>
-                                <TableView fx:id="table_gr_people" layoutX="486.0" layoutY="175.0" prefHeight="377.0" prefWidth="392.0">
+                                <TableView fx:id="table_gr_people" layoutX="526.0" layoutY="175.0" prefHeight="377.0" prefWidth="408.0">
                                     <columns>
                                         <TableColumn fx:id="table_gr_people_first" prefWidth="135.0" text="firstName" />
                                         <TableColumn fx:id="table_gr_people_second" prefWidth="76.0" text="secondName" />
@@ -77,12 +77,12 @@
                                         <Font name="System Bold" size="16.0" />
                                     </font>
                                 </Label>
-                                <TableView fx:id="table_gr" layoutX="29.0" layoutY="175.0" prefHeight="377.0" prefWidth="387.0">
+                                <TableView fx:id="table_gr" layoutX="29.0" layoutY="175.0" prefHeight="377.0" prefWidth="455.0">
                                     <columns>
-                                        <TableColumn fx:id="table_gr_name" prefWidth="75.0" text="name" />
-                                        <TableColumn fx:id="table_gr_year" prefWidth="73.0" text="year" />
-                                        <TableColumn fx:id="table_gr_course" prefWidth="87.0" text="course" />
-                                        <TableColumn fx:id="table_gr_count_people" prefWidth="75.0" text="count" />
+                                        <TableColumn fx:id="table_gr_name" prefWidth="127.0" text="name" />
+                                        <TableColumn fx:id="table_gr_year" prefWidth="99.0" text="year" />
+                                        <TableColumn fx:id="table_gr_course" prefWidth="100.0" text="course" />
+                                        <TableColumn fx:id="table_gr_count_people" prefWidth="100.0" text="count" />
                                     </columns>
                                     <columnResizePolicy>
                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -157,7 +157,7 @@
                               </Button>
                            </children>
                         </AnchorPane>
-                                <Button fx:id="btn_back_alc" layoutX="1213.0" layoutY="667.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="73.0" text="BACK">
+                                <Button fx:id="btn_back_gr" layoutX="1213.0" layoutY="667.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="73.0" text="BACK">
                            <font>
                               <Font size="14.0" />
                            </font>

@@ -7,10 +7,7 @@ import javafx.fxml.FXML
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.util.Callback
-import poko.Marks
-import poko.Subject
-import poko.Teacher
-import poko.TeacherSubjects
+import poko.*
 import java.sql.Connection
 
 
@@ -39,35 +36,24 @@ class ControllerTeacher {
     @FXML
     private var btn_create_alc_task: Button? = null
 
-    @FXML
-    private var table_gr_people: TableView<*>? = null
+    @FXML private var table_gr_people: TableView<Student>? = null
+    @FXML private var table_gr_people_first: TableColumn<Student, String>? = null
+    @FXML private var table_gr_people_second: TableColumn<Student, String>? = null
+    @FXML private var table_gr_people_middle: TableColumn<Student, String>? = null
 
     @FXML
-    private var table_gr_people_first: TableColumn<*, *>? = null
+    private var table_gr: TableView<Group>? = null
+    @FXML
+    private var table_gr_name: TableColumn<Group, String>? = null
+    @FXML
+    private var table_gr_year: TableColumn<Group, Long>? = null
+    @FXML
+    private var table_gr_course: TableColumn<Group, Long>? = null
+    @FXML
+    private var table_gr_count_people: TableColumn<Group, Long>? = null
 
     @FXML
-    private var table_gr_people_second: TableColumn<*, *>? = null
-
-    @FXML
-    private var table_gr_people_middle: TableColumn<*, *>? = null
-
-    @FXML
-    private var table_gr: TableView<*>? = null
-
-    @FXML
-    private var table_gr_name: TableColumn<*, *>? = null
-
-    @FXML
-    private var table_gr_year: TableColumn<*, *>? = null
-
-    @FXML
-    private var table_gr_course: TableColumn<*, *>? = null
-
-    @FXML
-    private var table_gr_count_people: TableColumn<*, *>? = null
-
-    @FXML
-    private var btn_show_alc: Button? = null
+    private var btn_gr_clean_people: Button? = null
 
     @FXML
     private var feld_show_alc: TextField? = null
@@ -94,7 +80,7 @@ class ControllerTeacher {
     private var btn_reg_gr: Button? = null
 
     @FXML
-    private var btn_back_alc: Button? = null
+    private var btn_back_gr: Button? = null
 
     @FXML
     private var tab_task: Tab? = null
@@ -328,9 +314,13 @@ class ControllerTeacher {
         tableTeacherFiller(Utils.getTeacherList(connection))
 
         tableMarks(connection)
-        //val mk = Utils.getFullMarksList(connection)
         val mk = Utils.getFilteredFullMarksList(connection)
         tableMarksFiller(mk)
+
+        tableGroups(connection)
+        tableGroupsFiller(Utils.getGroupList(connection))
+
+        tablePeopleInGroup(connection)
 
         table_teacher_sb_name_teacher?.cellValueFactory = PropertyValueFactory("secondName")
         table_teacher_sb_group?.cellValueFactory = PropertyValueFactory("groupName")
@@ -416,6 +406,46 @@ class ControllerTeacher {
     }
     /*MARKS LIST--------------------------------------------------------------------*/
 
+    /*GROUPS------------------------------------------------------------------------*/
+    fun tableGroups(connection: Connection) {
+
+        table_gr_name?.cellValueFactory = PropertyValueFactory("name")
+        table_gr_year?.cellValueFactory = PropertyValueFactory("year")
+        table_gr_course?.cellValueFactory = PropertyValueFactory("course")
+        table_gr_count_people?.cellValueFactory = PropertyValueFactory("peoples")
+        table_gr?.columns?.add(addButtonColumn("Action", "show") {
+            tablePeopleInGroupFiller(it.idGroup?.let { it1 -> Utils.getStudentsFromGroup(connection, it1) })
+        })
+    }
+
+    fun tableGroupsFiller(data: List<Group>?) {
+        table_gr?.items?.clear()
+        if (data != null) {
+            table_gr?.items?.addAll(data)
+            //println("Groups  is ${data}")
+        }
+    }
+
+    /*GROUPS----------------------------------------------------------------------*/
+
+    /*PEOPLE IN GROUP---------------------------------------------------------------*/
+    fun tablePeopleInGroup(connection: Connection) {
+        table_gr_people_second?.cellValueFactory = PropertyValueFactory("secondName")
+        table_gr_people_first?.cellValueFactory = PropertyValueFactory("firstName")
+        table_gr_people_middle?.cellValueFactory = PropertyValueFactory("middleName")
+        table_gr_people?.columns?.add(addButtonColumn("Action", "del") {
+            print("deleted student")
+        })
+    }
+    fun tablePeopleInGroupFiller(data:List<Student>?) {
+        table_gr_people?.items?.clear()
+        if (data != null) {
+            table_gr_people?.items?.addAll(data)
+            //println("Peoples in group  is ${data}")
+        }
+    }
+
+    /*PEOPLE IN GROUP---------------------------------------------------------------*/
     fun onTeacherAction(actionEvent: ActionEvent) {
 
     }
