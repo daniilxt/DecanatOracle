@@ -36,19 +36,30 @@ class ControllerTeacher {
     @FXML
     private var btn_create_alc_task: Button? = null
 
-    @FXML private var table_gr_people: TableView<Student>? = null
-    @FXML private var table_gr_people_first: TableColumn<Student, String>? = null
-    @FXML private var table_gr_people_second: TableColumn<Student, String>? = null
-    @FXML private var table_gr_people_middle: TableColumn<Student, String>? = null
+    @FXML
+    private var table_gr_people: TableView<Student>? = null
+
+    @FXML
+    private var table_gr_people_first: TableColumn<Student, String>? = null
+
+    @FXML
+    private var table_gr_people_second: TableColumn<Student, String>? = null
+
+    @FXML
+    private var table_gr_people_middle: TableColumn<Student, String>? = null
 
     @FXML
     private var table_gr: TableView<Group>? = null
+
     @FXML
     private var table_gr_name: TableColumn<Group, String>? = null
+
     @FXML
     private var table_gr_year: TableColumn<Group, Long>? = null
+
     @FXML
     private var table_gr_course: TableColumn<Group, Long>? = null
+
     @FXML
     private var table_gr_count_people: TableColumn<Group, Long>? = null
 
@@ -71,7 +82,7 @@ class ControllerTeacher {
     private var btn_reg_student: Button? = null
 
     @FXML
-    private var reg_gr_name: ComboBox<*>? = null
+    private var reg_gr_name: ComboBox<String>? = null
 
     @FXML
     private var reg_gr: TextField? = null
@@ -232,6 +243,18 @@ class ControllerTeacher {
         if (connection != null) {
             initTables(connection)
             initButtons(connection)
+            initSpinners(connection)
+        }
+    }
+
+    private fun initSpinners(connection: Connection) {
+        updateGroupSpinner(connection)
+    }
+
+    private fun updateGroupSpinner(connection: Connection) {
+        val groupList = Utils.getGroupList(connection)?.map { "${it.name}" }?.toList()
+        if (groupList != null) {
+            reg_gr_name?.items?.addAll(groupList)
         }
     }
 
@@ -239,6 +262,7 @@ class ControllerTeacher {
         btn_teacher_sb_clean?.setOnAction {
             table_teacher_sb?.items?.clear()
         }
+
         btn_search_teacher?.setOnAction {
             if (!teacher_search_first?.text.isNullOrBlank() || !teacher_search_second?.text.isNullOrBlank() || !teacher_search_middle?.text.isNullOrBlank()) {
                 tableTeacherFiller(
@@ -260,6 +284,17 @@ class ControllerTeacher {
                     if (it) {
                         tableTeacherFiller(Utils.getTeacherList(connection))
                     }
+                }
+            }
+        }
+
+        btn_reg_gr?.setOnAction {
+            if (!reg_gr?.text.isNullOrBlank()) {
+                if (Utils.createGroup(connection, reg_gr?.text)) {
+                    tableGroupsFiller(Utils.getGroupList(connection))
+                    updateGroupSpinner(connection)
+                } else {
+                    alert("Can't create group")
                 }
             }
         }
@@ -319,6 +354,7 @@ class ControllerTeacher {
 
         tableGroups(connection)
         tableGroupsFiller(Utils.getGroupList(connection))
+
 
         tablePeopleInGroup(connection)
 
@@ -416,6 +452,12 @@ class ControllerTeacher {
         table_gr?.columns?.add(addButtonColumn("Action", "show") {
             tablePeopleInGroupFiller(it.idGroup?.let { it1 -> Utils.getStudentsFromGroup(connection, it1) })
         })
+        table_gr?.columns?.add(addButtonColumn("Action", "delete") {
+            if (it.name?.let { it1 -> Utils.deleteGroup(connection, it1) } == true) {
+                tableGroupsFiller(Utils.getGroupList(connection))
+                updateGroupSpinner(connection)
+            }
+        })
     }
 
     fun tableGroupsFiller(data: List<Group>?) {
@@ -437,7 +479,8 @@ class ControllerTeacher {
             print("deleted student")
         })
     }
-    fun tablePeopleInGroupFiller(data:List<Student>?) {
+
+    fun tablePeopleInGroupFiller(data: List<Student>?) {
         table_gr_people?.items?.clear()
         if (data != null) {
             table_gr_people?.items?.addAll(data)

@@ -251,6 +251,30 @@ object Utils {
         return null
     }
 
+    fun createGroup(connection: Connection, name: String?): Boolean {
+        val sql = "insert into GROUPS (NAME)\n" +
+                "values ('${name}')"
+        try {
+            val resultSet = connection.createStatement().executeQuery(sql)
+            return resultSet.next()
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return false
+    }
+
+    fun deleteGroup(connection: Connection, groupName: String): Boolean {
+        val sql = "begin deleteGroup('${groupName}'); end;"
+        try {
+            val cs: CallableStatement = connection.prepareCall(sql)
+            cs.execute()
+            return true
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return false
+    }
+
     @Throws(SQLException::class)
     private fun <T> getFromResultSet(resultSet: ResultSet, action: () -> T): List<T>? {
         val records: MutableList<T> = ArrayList()
