@@ -165,8 +165,8 @@ object Utils {
         firstName: String = "",
         middleName: String = "",
         groupName: String = "",
-        year_from: Long = 0,
-        year_to: Long = 3000
+        year_from: Long? = 0,
+        year_to: Long? = 3000
     ): List<Marks>? {
         val sql = "select marks.id as ID_MARK, p.last_name,\n" +
                 "       p.first_name,\n" +
@@ -188,6 +188,7 @@ object Utils {
                 "  and g.name like '%${groupName.toLowerCase()}%'\n" +
                 "  and TO_NUMBER(substr(g.name, -4, 4)) between '$year_from' and '$year_to'" +
                 "order by marks.id"
+        println("sql query is ${sql}")
         return getFullMarksList(connection, sql)
     }
 

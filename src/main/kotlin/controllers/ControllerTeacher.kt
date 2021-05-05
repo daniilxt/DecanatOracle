@@ -283,14 +283,36 @@ class ControllerTeacher {
         }
         btn_mk_search?.setOnAction {
             if (!mk_name_search?.text.isNullOrBlank() || !mk_second_name_search?.text.isNullOrBlank() ||
-                !mk_middle_name_search?.text.isNullOrBlank() || !mk_from_search?.text.isNullOrBlank()
-                || !mk_to_search?.text.isNullOrBlank()
+                !mk_middle_name_search?.text.isNullOrBlank() || (switch_mk_group?.value.toString() != "null")
+                || !mk_from_search?.text.isNullOrBlank() || !mk_to_search?.text.isNullOrBlank()
             ) {
+                println("Clicked search")
                 tableMarksFiller(
                     Utils.getFilteredFullMarksList(
-                        connection, mk_second_name_search!!.text, mk_name_search!!.text, mk_middle_name_search!!.text
+                        connection,
+                        mk_second_name_search!!.text,
+                        mk_name_search!!.text,
+                        mk_middle_name_search!!.text,
+                        if (switch_mk_group?.value != null) {
+                            switch_mk_group?.value.toString()
+                        } else {
+                            ""
+                        },
+                        if (!mk_from_search!!.text.isNullOrBlank()) {
+                            mk_from_search!!.text.toLong()
+                        } else {
+                            0
+                        },
+                        if (!mk_to_search!!.text.isNullOrBlank()) {
+                            mk_to_search!!.text.toLong()
+                        } else {
+                            3000
+                        }
+
                     )
                 )
+            } else {
+                print("error")
             }
         }
     }
@@ -386,8 +408,8 @@ class ControllerTeacher {
     }
 
     private fun tableMarksFiller(data: List<Marks>?) {
+        table_marks?.items?.clear()
         if (data != null) {
-            table_marks?.items?.clear()
             table_marks?.items?.addAll(data)
             //println("Marks  is ${data}")
         }
