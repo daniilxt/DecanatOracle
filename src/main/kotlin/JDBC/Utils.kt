@@ -295,6 +295,20 @@ object Utils {
         return false
     }
 
+    fun deleteStudent(connection: Connection, idStudent: Long?):Boolean {
+        val sql = "begin\n" +
+                "    deleteStudent($idStudent);\n" +
+                "end;"
+        try {
+            val cs: CallableStatement = connection.prepareCall(sql)
+            cs.execute()
+            return true
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return false
+    }
+
     @Throws(SQLException::class)
     private fun <T> getFromResultSet(resultSet: ResultSet, action: () -> T): List<T>? {
         val records: MutableList<T> = ArrayList()

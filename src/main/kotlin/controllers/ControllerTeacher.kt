@@ -503,7 +503,12 @@ class ControllerTeacher {
         table_gr_people_first?.cellValueFactory = PropertyValueFactory("firstName")
         table_gr_people_middle?.cellValueFactory = PropertyValueFactory("middleName")
         table_gr_people?.columns?.add(addButtonColumn("Action", "del") {
-            print("deleted student")
+
+            if(Utils.deleteStudent(connection, it.idStudent)){
+                table_gr_people?.items?.remove(it)
+                print("deleted student ${it.idStudent}")
+                tableGroupsFiller(Utils.getGroupList(connection))
+            }
         })
     }
 
