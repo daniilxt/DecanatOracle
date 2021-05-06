@@ -206,8 +206,9 @@ object Utils {
         return getFullMarksList(connection, sql)
     }
 
-    fun deleteMark(connection: Connection, id: Long?) {
-
+    fun deleteMark(connection: Connection, id: Long?): Boolean {
+        val sql = "delete from marks mk where mk.id = $id"
+        return (doSomethingWithResult(connection, sql))
     }
 
     fun getGroupList(connection: Connection): List<Group>? {

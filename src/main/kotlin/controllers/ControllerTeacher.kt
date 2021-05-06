@@ -672,7 +672,12 @@ class ControllerTeacher {
 
     private fun deleteMark(connection: Connection, it: Marks) {
         println("DELETED MARKS ${it.id}")
-        //   Utils.deleteMark(connection,it.id)
+        if ((Utils.deleteMark(connection, it.id))) {
+            table_marks?.items?.remove(it)
+            alert("SUCCESS", Alert.AlertType.CONFIRMATION)
+        } else {
+            alert("ERROR")
+        }
     }
 
     private fun tableMarksFiller(data: List<Marks>?) {
