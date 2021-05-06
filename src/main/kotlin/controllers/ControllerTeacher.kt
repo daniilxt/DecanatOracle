@@ -298,6 +298,33 @@ class ControllerTeacher {
                 }
             }
         }
+        btn_reg_student?.setOnAction {
+            if (!reg_name?.text.isNullOrBlank() &&
+                !reg_second_name?.text.isNullOrBlank() &&
+                !reg_middle_name?.text.isNullOrBlank() && reg_gr_name?.value != null
+            ) {
+                if (Utils.createStudent(
+                        connection,
+                        reg_name!!.text,
+                        reg_second_name!!.text,
+                        reg_middle_name!!.text,
+                        reg_gr_name!!.value.toString()
+                    )
+                ) {
+                    alert("SUCCESS", Alert.AlertType.CONFIRMATION)
+                    tableGroupsFiller(Utils.getGroupList(connection))
+                    reg_name!!.text = ""
+                    reg_second_name!!.text = ""
+                    reg_middle_name!!.text = ""
+                    reg_gr_name!!.value = ""
+                } else {
+                    alert("Can't create student")
+
+                }
+            } else {
+                alert("Can't create student. Check all fields")
+            }
+        }
 
         btn_create_give?.setOnAction {
             println("WELCOME TO MARKS")

@@ -275,6 +275,26 @@ object Utils {
         return false
     }
 
+    fun createStudent(
+        connection: Connection,
+        name: String?,
+        surname: String?,
+        middleName: String?,
+        group: String
+    ): Boolean {
+        val sql = "begin\n" +
+                "    INSERTTOGROUP('${group}','${name}','${surname}','${middleName}');\n" +
+                "end;"
+        try {
+            val cs: CallableStatement = connection.prepareCall(sql)
+            cs.execute()
+            return true
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return false
+    }
+
     @Throws(SQLException::class)
     private fun <T> getFromResultSet(resultSet: ResultSet, action: () -> T): List<T>? {
         val records: MutableList<T> = ArrayList()
