@@ -178,6 +178,7 @@ object Utils {
         firstName: String = "",
         middleName: String = "",
         groupName: String = "",
+        subject: String = "",
         year_from: Long? = 0,
         year_to: Long? = 3000
     ): List<Marks>? {
@@ -198,6 +199,7 @@ object Utils {
                 " where lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
                 "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
                 "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'\n" +
+                "  and lower(s.name) like '%${subject.toLowerCase()}%'\n" +
                 "  and g.name like '%${groupName.toLowerCase()}%'\n" +
                 "  and TO_NUMBER(substr(g.name, -4, 4)) between '$year_from' and '$year_to'" +
                 "order by marks.id"

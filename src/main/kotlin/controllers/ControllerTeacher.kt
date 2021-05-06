@@ -1,5 +1,6 @@
 package controllers
 
+import JDBC.Type
 import JDBC.Utils
 import JDBC.dao.User
 import javafx.event.ActionEvent
@@ -7,6 +8,8 @@ import javafx.fxml.FXML
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.util.Callback
+import jdk.jfr.Enabled
+import jdk.jshell.execution.Util
 import poko.*
 import java.sql.Connection
 
@@ -145,13 +148,40 @@ class ControllerTeacher {
     private var btn_mk_search: Button? = null
 
     @FXML
-    private var switch_mk_group: ComboBox<*>? = null
+    private var switch_mk_group: ComboBox<String>? = null
+
+    @FXML
+    private var switch_mk_subject: ComboBox<String>? = null
 
     @FXML
     private var mk_from_search: TextField? = null
 
     @FXML
     private var mk_to_search: TextField? = null
+
+    @FXML
+    private var mk_name_edit: TextField? = null
+
+    @FXML
+    private var mk_second_name_edit: TextField? = null
+
+    @FXML
+    private var mk_middle_name_edit: TextField? = null
+
+    @FXML
+    private var mk_value_edit: TextField? = null
+
+    @FXML
+    private var switch_mk_edit_teacher: ComboBox<String>? = null
+
+    @FXML
+    private var switch_mk_edit_subject: ComboBox<String>? = null
+
+    @FXML
+    private var btn_mk_edit_add: Button? = null
+
+    @FXML
+    private var btn_mk_edit_clear: Button? = null
 
     @FXML
     private var feld_show_task: TextField? = null
@@ -239,6 +269,8 @@ class ControllerTeacher {
         alert.showAndWait()
     }
 
+    private var editedMarkId: Long? = null
+
     @FXML
     fun initialize(user: User) {
         val connection = Utils.getNewConnection()
@@ -253,6 +285,40 @@ class ControllerTeacher {
     private fun initSpinners(connection: Connection) {
         updateGroupSpinner(connection)
         updateSubjectsInTeacherSpinner(connection)
+
+        updateTeacherSpinnerInMarksEdit(connection)
+        updateSubjectSpinnerInMarksEdit(connection)
+        updateSubjectSpinnerInMarksFind(connection)
+        updateGroupSpinnerInMarksFind(connection)
+    }
+
+    private fun updateTeacherSpinnerInMarksEdit(connection: Connection) {
+        val teacherList =
+            Utils.getTeacherList(connection)?.map { "${it.secondName} ${it.firstName} ${it.middleName}" }?.toList()
+        if (teacherList != null) {
+            switch_mk_edit_teacher?.items?.addAll(teacherList)
+        }
+    }
+
+    private fun updateSubjectSpinnerInMarksEdit(connection: Connection) {
+        val groupList = Utils.getSubjectList(connection)?.map { "${it.name}" }?.toList()
+        if (groupList != null) {
+            switch_mk_edit_subject?.items?.addAll(groupList)
+        }
+    }
+
+    private fun updateSubjectSpinnerInMarksFind(connection: Connection) {
+        val subjectList = Utils.getSubjectList(connection)?.map { "${it.name}" }?.toMutableList()?.apply { add(0, "") }
+        if (subjectList != null) {
+            switch_mk_subject?.items?.addAll(subjectList)
+        }
+    }
+
+    private fun updateGroupSpinnerInMarksFind(connection: Connection) {
+        val subjectList = Utils.getGroupList(connection)?.map { "${it.name}" }?.toMutableList()?.apply { add(0, "") }
+        if (subjectList != null) {
+            switch_mk_group?.items?.addAll(subjectList)
+        }
     }
 
     private fun updateSubjectsInTeacherSpinner(connection: Connection) {
@@ -295,7 +361,7 @@ class ControllerTeacher {
                         }
                     )
                 )
-            }else{
+            } else {
                 alert("Empty input")
             }
         }
@@ -308,10 +374,10 @@ class ControllerTeacher {
                     if (it) {
                         tableTeacherFiller(Utils.getTeacherList(connection))
                         alert("SUCCESS", Alert.AlertType.CONFIRMATION)
-                        reg_teacher_first?.text= ""
-                        reg_teacher_second?.text= ""
-                        reg_teacher_middle?.text= ""
-                    }else{
+                        reg_teacher_first?.text = ""
+                        reg_teacher_second?.text = ""
+                        reg_teacher_middle?.text = ""
+                    } else {
                         alert("Can't create teacher")
                     }
                 }
@@ -357,12 +423,13 @@ class ControllerTeacher {
         }
 
         btn_clear_mk?.setOnAction {
-            println("WELCOME TO MARKS")
+            tableMarksFiller(Utils.getFilteredFullMarksList(connection))
         }
         btn_mk_search?.setOnAction {
             if (!mk_name_search?.text.isNullOrBlank() || !mk_second_name_search?.text.isNullOrBlank() ||
                 !mk_middle_name_search?.text.isNullOrBlank() || (switch_mk_group?.value.toString() != "null")
-                || !mk_from_search?.text.isNullOrBlank() || !mk_to_search?.text.isNullOrBlank()
+                || (switch_mk_subject?.value.toString() != "null") || !mk_from_search?.text.isNullOrBlank()
+                || !mk_to_search?.text.isNullOrBlank()
             ) {
                 println("Clicked search")
                 tableMarksFiller(
@@ -373,6 +440,11 @@ class ControllerTeacher {
                         mk_middle_name_search!!.text,
                         if (switch_mk_group?.value != null) {
                             switch_mk_group?.value.toString()
+                        } else {
+                            ""
+                        },
+                        if (switch_mk_subject?.value != null) {
+                            switch_mk_subject?.value.toString()
                         } else {
                             ""
                         },
@@ -392,6 +464,29 @@ class ControllerTeacher {
             } else {
                 print("error")
             }
+        }
+        btn_mk_edit_add?.setOnAction {
+            if (
+                !mk_name_edit?.text.isNullOrBlank() &&
+                !mk_second_name_edit?.text.isNullOrBlank() &&
+                !mk_middle_name_edit?.text.isNullOrBlank() &&
+                !mk_value_edit?.text.isNullOrBlank() &&
+                switch_mk_edit_teacher?.value != null &&
+                switch_mk_edit_subject?.value != null
+            ) {
+                if (editedMarkId != null) {
+                    println("OK mk id = ${editedMarkId}")
+                    editedMarkId = null
+                } else {
+                    println("OK")
+                }
+            } else {
+                alert("Fill all fields")
+            }
+        }
+        btn_mk_edit_clear?.setOnAction {
+            changeFieldStatusInEditMarks(Type.ENABLED)
+
         }
     }
 
@@ -495,6 +590,47 @@ class ControllerTeacher {
         table_marks?.columns?.add(addButtonColumn("Action", "del") {
             deleteMark(connection, it)
         })
+        table_marks?.columns?.add(addButtonColumn("Action", "edit") {
+            editMark(connection, it)
+        })
+    }
+
+    private fun editMark(connection: Connection, it: Marks) {
+        editedMarkId = it.id
+        mk_name_edit?.text = it.stFirstName
+        mk_second_name_edit?.text = it.stSecondName
+        mk_middle_name_edit?.text = it.stMiddleName
+        mk_value_edit?.text = it.value.toString()
+        switch_mk_edit_teacher?.value = "${it.thSecondName} ${it.thFirstName} ${it.thMiddleName}"
+        switch_mk_edit_subject?.value = it.subject
+        changeFieldStatusInEditMarks(Type.DISABLED)
+
+    }
+
+    private fun changeFieldStatusInEditMarks(status: Type) {
+        when (status) {
+            Type.DISABLED -> {
+                mk_name_edit?.isEditable = false
+                mk_second_name_edit?.isEditable = false
+                mk_middle_name_edit?.isEditable = false
+                switch_mk_edit_teacher?.isDisable = true
+                switch_mk_edit_subject?.isDisable = true
+            }
+            Type.ENABLED -> {
+                mk_name_edit?.isEditable = true
+                mk_second_name_edit?.isEditable = true
+                mk_middle_name_edit?.isEditable = true
+                switch_mk_edit_teacher?.isDisable = false
+                switch_mk_edit_subject?.isDisable = false
+
+                mk_name_edit?.text = ""
+                mk_second_name_edit?.text = ""
+                mk_middle_name_edit?.text = ""
+                mk_value_edit?.text = ""
+                switch_mk_edit_teacher?.value = ""
+                switch_mk_edit_subject?.value = ""
+            }
+        }
     }
 
     private fun deleteMark(connection: Connection, it: Marks) {
@@ -579,7 +715,11 @@ class ControllerTeacher {
 
     }
 
-    private fun <T> addButtonColumn(columnName: String, btnName: String, func: (it: T) -> Unit): TableColumn<T, Void> {
+    private fun <T> addButtonColumn(
+        columnName: String,
+        btnName: String,
+        func: (it: T) -> Unit
+    ): TableColumn<T, Void> {
         val colBtn: TableColumn<T, Void> = TableColumn(columnName)
         val cellFactory: Callback<TableColumn<T?, Void?>?, TableCell<T?, Void?>?> =
             Callback {
