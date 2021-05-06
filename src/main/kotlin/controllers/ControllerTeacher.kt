@@ -475,10 +475,46 @@ class ControllerTeacher {
                 switch_mk_edit_subject?.value != null
             ) {
                 if (editedMarkId != null) {
-                    println("OK mk id = ${editedMarkId}")
-                    editedMarkId = null
+                    try {
+                        if (mk_value_edit?.text!!.toLong() in 2..5) {
+                            Utils.editMark(connection, editedMarkId!!, mk_value_edit!!.text.toLong())
+                            editedMarkId = null
+                            changeFieldStatusInEditMarks(Type.ENABLED)
+                            alert("SUCCESS", Alert.AlertType.CONFIRMATION)
+                            tableMarksFiller(Utils.getFilteredFullMarksList(connection))
+                        } else {
+                            alert("Incorrect mark value")
+                        }
+                    } catch (e: Exception) {
+                        alert("Input number between 2 and 5")
+                    }
                 } else {
-                    println("OK")
+                    val (teacherSecond, teacherFirst, teacherMiddle) = switch_mk_edit_teacher?.value?.split(" ")!!
+                        .toList()
+                    if (Utils.createMark(
+                            connection, Marks(
+                                null,
+                                mk_second_name_edit!!.text,
+                                mk_name_edit!!.text,
+                                mk_middle_name_edit!!.text,
+                                null,
+                                teacherSecond,
+                                teacherFirst,
+                                teacherMiddle,
+                                switch_mk_edit_subject?.value,
+                                value = mk_value_edit?.text?.toLong()
+                            )
+                        )
+                    ) {
+                        println("OK ${editedMarkId}")
+                        changeFieldStatusInEditMarks(Type.ENABLED)
+                        alert("SUCCESS", Alert.AlertType.CONFIRMATION)
+                        tableMarksFiller(Utils.getFilteredFullMarksList(connection))
+                    } else {
+                        println("ERROR ${editedMarkId}")
+                        alert("ERROR")
+
+                    }
                 }
             } else {
                 alert("Fill all fields")
@@ -486,6 +522,7 @@ class ControllerTeacher {
         }
         btn_mk_edit_clear?.setOnAction {
             changeFieldStatusInEditMarks(Type.ENABLED)
+            editedMarkId = null
 
         }
     }

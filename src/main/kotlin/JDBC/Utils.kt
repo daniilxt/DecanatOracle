@@ -79,17 +79,17 @@ object Utils {
         secondName: String = "",
         firstName: String = "",
         middleName: String = "",
-        subject:String=""
+        subject: String = ""
     ): List<Teacher>? {
         val sql2 =
             "select p.last_name as LAST_NAME, p.first_name as FIRST_NAME, p.pather_name as PATHER_NAME," +
                     " p.first_name as  NAME,p.id as ID\n" +
                     "from people p\n" +
                     "inner join subjects sb on p"
-                    "where lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
-                    "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
-                    "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'"+
-                    "  and lower(p.pather_name) like '%${subject.toLowerCase()}%'"
+        "where lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
+                "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
+                "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'" +
+                "  and lower(p.pather_name) like '%${subject.toLowerCase()}%'"
 
         val sql = "select p.id, p.last_name, p.first_name, p.pather_name, sb.name\n" +
                 "from marks mk\n" +
@@ -98,8 +98,8 @@ object Utils {
                 "where p.type = 'T'\n" +
                 "and lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
                 "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
-                "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'"+
-                "  and lower(sb.name) like '%${subject.toLowerCase()}%'\n"+
+                "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'" +
+                "  and lower(sb.name) like '%${subject.toLowerCase()}%'\n" +
                 "group by p.last_name, p.first_name, p.pather_name, sb.name, p.id"
         println(sql)
         return getTeacherList(connection, sql)
@@ -311,7 +311,7 @@ object Utils {
         return false
     }
 
-    fun deleteStudent(connection: Connection, idStudent: Long?):Boolean {
+    fun deleteStudent(connection: Connection, idStudent: Long?): Boolean {
         val sql = "begin\n" +
                 "    deleteStudent($idStudent);\n" +
                 "end;"
@@ -326,7 +326,7 @@ object Utils {
     }
 
     fun getSubjectList(connection: Connection): List<Subject>? {
-    val sql = "select sb.id as ID_SUBJECT, sb.name as SB_NAME from subjects sb"
+        val sql = "select sb.id as ID_SUBJECT, sb.name as SB_NAME from subjects sb"
         try {
             val resultSet = connection.createStatement().executeQuery(sql)
             return if (!resultSet.next()) {
@@ -343,6 +343,28 @@ object Utils {
             println(ex)
         }
         return null
+    }
+
+    fun createMark(connection: Connection, it: Marks): Boolean {
+        val sql = "begin\n" +
+                "    createMark\n" +
+                "    ('${it.stSecondName}','${it.stFirstName}','${it.stMiddleName}'," +
+                "'${it.thSecondName}','${it.thFirstName}','${it.thMiddleName}','${it.subject?.toLowerCase()}','${it.value}');\n" +
+                "    end;"
+        println(sql)
+        try {
+            val cs: CallableStatement = connection.prepareCall(sql)
+            cs.execute()
+            return true
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return false
+    }
+
+    fun editMark(connection: Connection, idMark: Long, value: Long): Boolean {
+        val sql = "update marks mk set mk.value = '$value' where mk.id = ${idMark}\n"
+        return (doSomethingWithResult(connection, sql))
     }
 
     @Throws(SQLException::class)
