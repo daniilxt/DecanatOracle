@@ -78,15 +78,30 @@ object Utils {
         connection: Connection,
         secondName: String = "",
         firstName: String = "",
-        middleName: String = ""
+        middleName: String = "",
+        subject:String=""
     ): List<Teacher>? {
-        val sql =
+        val sql2 =
             "select p.last_name as LAST_NAME, p.first_name as FIRST_NAME, p.pather_name as PATHER_NAME," +
                     " p.first_name as  NAME,p.id as ID\n" +
                     "from people p\n" +
+                    "inner join subjects sb on p"
                     "where lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
                     "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
-                    "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'"
+                    "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'"+
+                    "  and lower(p.pather_name) like '%${subject.toLowerCase()}%'"
+
+        val sql = "select p.id, p.last_name, p.first_name, p.pather_name, sb.name\n" +
+                "from marks mk\n" +
+                "         right join people p on p.id = mk.teacher_id\n" +
+                "         left join subjects sb on mk.subject_id = sb.id\n" +
+                "where p.type = 'T'\n" +
+                "and lower(p.last_name) like '%${secondName.toLowerCase()}%'\n" +
+                "  and lower(p.first_name) like '%${firstName.toLowerCase()}%'\n" +
+                "  and lower(p.pather_name) like '%${middleName.toLowerCase()}%'"+
+                "  and lower(sb.name) like '%${subject.toLowerCase()}%'\n"+
+                "group by p.last_name, p.first_name, p.pather_name, sb.name, p.id"
+        println(sql)
         return getTeacherList(connection, sql)
     }
 
@@ -186,7 +201,6 @@ object Utils {
                 "  and g.name like '%${groupName.toLowerCase()}%'\n" +
                 "  and TO_NUMBER(substr(g.name, -4, 4)) between '$year_from' and '$year_to'" +
                 "order by marks.id"
-        println("sql query is ${sql}")
         return getFullMarksList(connection, sql)
     }
 
@@ -307,6 +321,26 @@ object Utils {
             println(ex)
         }
         return false
+    }
+
+    fun getSubjectList(connection: Connection): List<Subject>? {
+    val sql = "select sb.id as ID_SUBJECT, sb.name as SB_NAME from subjects sb"
+        try {
+            val resultSet = connection.createStatement().executeQuery(sql)
+            return if (!resultSet.next()) {
+                null
+            } else {
+                getFromResultSet(resultSet) {
+                    Subject(
+                        resultSet.getString("SB_NAME"),
+                        resultSet.getLong("ID_SUBJECT")
+                    )
+                }
+            }
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return null
     }
 
     @Throws(SQLException::class)

@@ -97,7 +97,7 @@ class ControllerTeacher {
     private var tab_task: Tab? = null
 
     @FXML
-    private var btn_create_give: Button? = null
+    private var btn_clear_mk: Button? = null
 
     @FXML
     private var table_marks: TableView<Marks>? = null
@@ -130,7 +130,7 @@ class ControllerTeacher {
     private var mk_value: TableColumn<Marks, Long>? = null
 
     @FXML
-    private var btn_show_task: Button? = null
+    private var btn_back_mk: Button? = null
 
     @FXML
     private var mk_name_search: TextField? = null
@@ -226,7 +226,10 @@ class ControllerTeacher {
     private var btn_search_teacher: Button? = null
 
     @FXML
-    private var teacher_switch_subject: ComboBox<*>? = null
+    private var btn_teacher_refresh: Button? = null
+
+    @FXML
+    private var teacher_switch_subject: ComboBox<String>? = null
 
     @FXML
     private fun alert(str: String = "Incorrect input", type: Alert.AlertType = Alert.AlertType.ERROR) {
@@ -249,6 +252,14 @@ class ControllerTeacher {
 
     private fun initSpinners(connection: Connection) {
         updateGroupSpinner(connection)
+        updateSubjectsInTeacherSpinner(connection)
+    }
+
+    private fun updateSubjectsInTeacherSpinner(connection: Connection) {
+        val groupList = Utils.getSubjectList(connection)?.map { "${it.name}" }?.toMutableList()?.apply { add(0, "") }
+        if (groupList != null) {
+            teacher_switch_subject?.items?.addAll(groupList)
+        }
     }
 
     private fun updateGroupSpinner(connection: Connection) {
@@ -259,20 +270,33 @@ class ControllerTeacher {
     }
 
     private fun initButtons(connection: Connection) {
+        moveButtons(connection)
         btn_teacher_sb_clean?.setOnAction {
             table_teacher_sb?.items?.clear()
         }
+        btn_teacher_refresh?.setOnAction {
+            tableTeacherFiller(Utils.getTeacherList(connection))
+        }
 
         btn_search_teacher?.setOnAction {
-            if (!teacher_search_first?.text.isNullOrBlank() || !teacher_search_second?.text.isNullOrBlank() || !teacher_search_middle?.text.isNullOrBlank()) {
+            if (!teacher_search_first?.text.isNullOrBlank() || !teacher_search_second?.text.isNullOrBlank() || !teacher_search_middle?.text.isNullOrBlank() ||
+                teacher_switch_subject?.value != null
+            ) {
                 tableTeacherFiller(
                     Utils.findTeacher(
                         connection,
                         teacher_search_second!!.text,
                         teacher_search_first!!.text,
-                        teacher_search_middle!!.text
+                        teacher_search_middle!!.text,
+                        if (teacher_switch_subject?.value != null) {
+                            teacher_switch_subject?.value.toString()
+                        } else {
+                            ""
+                        }
                     )
                 )
+            }else{
+                alert("Empty input")
             }
         }
         btn_reg_teacher?.setOnAction {
@@ -283,6 +307,12 @@ class ControllerTeacher {
                 ) {
                     if (it) {
                         tableTeacherFiller(Utils.getTeacherList(connection))
+                        alert("SUCCESS", Alert.AlertType.CONFIRMATION)
+                        reg_teacher_first?.text= ""
+                        reg_teacher_second?.text= ""
+                        reg_teacher_middle?.text= ""
+                    }else{
+                        alert("Can't create teacher")
                     }
                 }
             }
@@ -326,7 +356,7 @@ class ControllerTeacher {
             }
         }
 
-        btn_create_give?.setOnAction {
+        btn_clear_mk?.setOnAction {
             println("WELCOME TO MARKS")
         }
         btn_mk_search?.setOnAction {
@@ -362,6 +392,16 @@ class ControllerTeacher {
             } else {
                 print("error")
             }
+        }
+    }
+
+    private fun moveButtons(connection: Connection) {
+        btn_back_mk?.setOnAction {
+            println("BACK FROM MK")
+        }
+
+        btn_teacher_back?.setOnAction {
+            println("PRESSED BACK")
         }
     }
 
@@ -413,6 +453,8 @@ class ControllerTeacher {
             Utils.deleteTeacher(connection, res) {
                 if (!it) {
                     alert("Teacher has links")
+                } else {
+                    alert("SUCCESS", Alert.AlertType.CONFIRMATION)
                 }
                 tableTeacherFiller(Utils.getTeacherList(connection))
             }
@@ -504,7 +546,7 @@ class ControllerTeacher {
         table_gr_people_middle?.cellValueFactory = PropertyValueFactory("middleName")
         table_gr_people?.columns?.add(addButtonColumn("Action", "del") {
 
-            if(Utils.deleteStudent(connection, it.idStudent)){
+            if (Utils.deleteStudent(connection, it.idStudent)) {
                 table_gr_people?.items?.remove(it)
                 print("deleted student ${it.idStudent}")
                 tableGroupsFiller(Utils.getGroupList(connection))
