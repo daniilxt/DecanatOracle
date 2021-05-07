@@ -368,6 +368,81 @@ object Utils {
         return (doSomethingWithResult(connection, sql))
     }
 
+    fun getStatisticsList(connection: Connection): List<Statistics>? {
+        val sql = "with marks_sb as (\n" +
+                "    select  substr(gr.name, -4, 4) as year, s.name as sb_name, mk.value as mk_value\n" +
+                "    from groups gr\n" +
+                "             inner join people p on gr.id = p.group_id\n" +
+                "             inner join marks mk on mk.student_id = p.id\n" +
+                "             inner join subjects s on mk.subject_id = s.id\n" +
+                "    order by year)\n" +
+                "select marks_sb.year, marks_sb.sb_name, avg(marks_sb.mk_value) as avg\n" +
+                "from marks_sb\n" +
+                "group by marks_sb.year, marks_sb.sb_name\n" +
+                "order by year"
+        try {
+            val resultSet = connection.createStatement().executeQuery(sql)
+            return if (!resultSet.next()) {
+                null
+            } else {
+                getFromResultSet(resultSet) {
+                    Statistics(
+                        year = resultSet.getString(1), subject = resultSet.getString(2), avg = resultSet.getString(3)
+                    )
+                }
+            }
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return null
+    }
+
+    fun getFilteredStatistics(
+        connection: Connection,
+        gr: String,
+        sb: String,
+        teacher: String,
+        from: String,
+        to: String
+    ): List<Statistics>? {
+        val sql = "with marks_sb as (\n" +
+                "    select substr(gr.name, -4, 4) as year,\n" +
+                "           s.name                 as sb_name,\n" +
+                "           mk.value               as mk_value,\n" +
+                "           gr.name                as gr_name\n" +
+                "    from groups gr\n" +
+                "             inner join people p on gr.id = p.group_id\n" +
+                "             inner join marks mk on mk.student_id = p.id\n" +
+                "             inner join subjects s on mk.subject_id = s.id\n" +
+                "    order by year)\n" +
+                "select marks_sb.year, marks_sb.sb_name, avg(marks_sb.mk_value) as avg, gr_name\n" +
+                "from marks_sb\n" +
+                "where year between '$from' and '$to'\n" +
+                "  and gr_name like '%${gr}%'\n" +
+                "    and sb_name like'%${sb}%'\n" +
+                "group by marks_sb.year,  marks_sb.sb_name,gr_name\n" +
+                "order by year\n"
+        println(sql)
+        try {
+            val resultSet = connection.createStatement().executeQuery(sql)
+            return if (!resultSet.next()) {
+                null
+            } else {
+                getFromResultSet(resultSet) {
+                    Statistics(
+                        year = resultSet.getString(1),
+                        subject = resultSet.getString(2),
+                        avg = resultSet.getString(3),
+                        group = resultSet.getString(4)
+                    )
+                }
+            }
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return null
+    }
+
     @Throws(SQLException::class)
     private fun <T> getFromResultSet(resultSet: ResultSet, action: () -> T): List<T>? {
         val records: MutableList<T> = ArrayList()

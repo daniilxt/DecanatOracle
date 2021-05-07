@@ -8,8 +8,6 @@ import javafx.fxml.FXML
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.util.Callback
-import jdk.jfr.Enabled
-import jdk.jshell.execution.Util
 import poko.*
 import java.sql.Connection
 
@@ -262,6 +260,46 @@ class ControllerTeacher {
     private var teacher_switch_subject: ComboBox<String>? = null
 
     @FXML
+    private var switch_param_subject: ComboBox<String>? = null
+
+    @FXML
+    private var switch_param_group: ComboBox<String>? = null
+
+    @FXML
+    private var switch_param_teacher: ComboBox<String>? = null
+
+    @FXML
+    private var btn_param_filter: Button? = null
+
+    @FXML
+    private var btn_subjects_clean: Button? = null
+
+    @FXML
+    private var subject_param_from: TextField? = null
+
+    @FXML
+    private var subject_param_to: TextField? = null
+
+    @FXML
+    private var table_stat: TableView<Statistics>? = null
+
+    @FXML
+    private var table_stat_year: TableColumn<Statistics, String>? = null
+
+    @FXML
+    private var table_stat_subject: TableColumn<Statistics, String>? = null
+
+    @FXML
+    private var table_stat_avg: TableColumn<Statistics, String>? = null
+
+    @FXML
+    private var table_stat_last_name: TableColumn<Statistics, String>? = null
+
+    @FXML
+    private var table_stat_group: TableColumn<Statistics, String>? = null
+
+
+    @FXML
     private fun alert(str: String = "Incorrect input", type: Alert.AlertType = Alert.AlertType.ERROR) {
         val alert = Alert(type)
         alert.title = "Attention"
@@ -290,6 +328,34 @@ class ControllerTeacher {
         updateSubjectSpinnerInMarksEdit(connection)
         updateSubjectSpinnerInMarksFind(connection)
         updateGroupSpinnerInMarksFind(connection)
+
+        updateGroupSpinnerInStatistics(connection)
+        updateTeacherSpinnerInStatistics(connection)
+        updateSubjectSpinnerInStatistics(connection)
+
+    }
+
+    private fun updateGroupSpinnerInStatistics(connection: Connection) {
+        val groupList = Utils.getGroupList(connection)?.map { "${it.name}" }?.toMutableList()?.apply { add(0, "") }
+        if (groupList != null) {
+            switch_param_group?.items?.addAll(groupList)
+        }
+    }
+
+    private fun updateTeacherSpinnerInStatistics(connection: Connection) {
+        val teacherList =
+            Utils.getTeacherList(connection)?.map { "${it.secondName} ${it.firstName} ${it.middleName}" }
+                ?.toMutableList()?.apply { add(0, "") }
+        if (teacherList != null) {
+            switch_param_teacher?.items?.addAll(teacherList)
+        }
+    }
+
+    private fun updateSubjectSpinnerInStatistics(connection: Connection) {
+        val groupList = Utils.getSubjectList(connection)?.map { "${it.name}" }?.toMutableList()?.apply { add(0, "") }
+        if (groupList != null) {
+            switch_param_subject?.items?.addAll(groupList)
+        }
     }
 
     private fun updateTeacherSpinnerInMarksEdit(connection: Connection) {
@@ -525,6 +591,46 @@ class ControllerTeacher {
             editedMarkId = null
 
         }
+
+        btn_param_filter?.setOnAction {
+            if (!subject_param_from?.text.isNullOrBlank() || !subject_param_to?.text.isNullOrBlank() ||
+                switch_param_group?.value != null || switch_param_subject?.value != null || switch_param_teacher?.value != null
+            ) {
+                tableStatisticFiller(
+                    Utils.getFilteredStatistics(
+                        connection,
+                        if (switch_param_group?.value != null) {
+                            switch_param_group?.value.toString()
+                        } else {
+                            ""
+                        },
+                        if (switch_param_subject?.value != null) {
+                            switch_param_subject?.value.toString()
+                        } else {
+                            ""
+                        },
+                        if (switch_param_teacher?.value != null) {
+                            switch_param_teacher?.value.toString()
+                        } else {
+                            ""
+                        },
+                        if (!subject_param_from?.text.isNullOrBlank()) {
+                            subject_param_from!!.text
+                        } else {
+                            "0"
+                        },
+                        if (!subject_param_to?.text.isNullOrBlank()) {
+                            subject_param_to!!.text
+                        } else {
+                            "3000"
+                        }
+                    )
+                )
+            }
+        }
+        btn_subjects_clean?.setOnAction {
+            tableStatisticFiller(Utils.getStatisticsList(connection))
+        }
     }
 
     private fun moveButtons(connection: Connection) {
@@ -554,13 +660,16 @@ class ControllerTeacher {
         tableGroups(connection)
         tableGroupsFiller(Utils.getGroupList(connection))
 
-
         tablePeopleInGroup(connection)
+
+        tableStatistic(connection)
+        tableStatisticFiller(Utils.getStatisticsList(connection))
 
         table_teacher_sb_name_teacher?.cellValueFactory = PropertyValueFactory("secondName")
         table_teacher_sb_group?.cellValueFactory = PropertyValueFactory("groupName")
         table_teacher_sb_subject?.cellValueFactory = PropertyValueFactory("subject")
     }
+
 
     /*Teacher--------------------------------------------------------------------*/
 
@@ -610,6 +719,7 @@ class ControllerTeacher {
 
     }
     /*Teacher--------------------------------------------------------------------*/
+
 
     /*MARKS LIST--------------------------------------------------------------------*/
 
@@ -687,7 +797,6 @@ class ControllerTeacher {
             //println("Marks  is ${data}")
         }
     }
-    /*MARKS LIST--------------------------------------------------------------------*/
 
     /*GROUPS------------------------------------------------------------------------*/
     fun tableGroups(connection: Connection) {
@@ -747,6 +856,25 @@ class ControllerTeacher {
 
     fun onExitAction(actionEvent: ActionEvent) {
 
+    }
+
+    /*MARKS LIST--------------------------------------------------------------------*/
+
+
+    /*STAT LIST--------------------------------------------------------------------*/
+    private fun tableStatistic(connection: Connection) {
+        table_stat_year?.cellValueFactory = PropertyValueFactory("year")
+        table_stat_subject?.cellValueFactory = PropertyValueFactory("subject")
+        table_stat_avg?.cellValueFactory = PropertyValueFactory("avg")
+        table_stat_last_name?.cellValueFactory = PropertyValueFactory("lastName")
+        table_stat_group?.cellValueFactory = PropertyValueFactory("group")
+    }
+
+    private fun tableStatisticFiller(data: List<Statistics>?) {
+        table_stat?.items?.clear()
+        if (data != null) {
+            table_stat?.items?.addAll(data)
+        }
     }
 
     fun onGroupsAction(actionEvent: ActionEvent) {
