@@ -454,7 +454,7 @@
                               <TableColumn fx:id="table_stat_year" prefWidth="76.0" text="YEAR" />
                               <TableColumn fx:id="table_stat_subject" prefWidth="135.0" text="subject" />
                               <TableColumn fx:id="table_stat_avg" prefWidth="76.0" text="AVG" />
-                              <TableColumn fx:id="table_stat_last_name" prefWidth="76.0" text="lastName" />
+                              <TableColumn fx:id="table_stat_last_name" prefWidth="76.0" text="lastName" visible="false" />
                               <TableColumn fx:id="table_stat_group" prefWidth="76.0" text="group" />
                            </columns>
                            <columnResizePolicy>
@@ -481,26 +481,26 @@
                               <Font size="14.0" />
                            </font>
                         </Button>
-                        <AnchorPane layoutX="904.0" layoutY="56.0" prefHeight="556.0" prefWidth="316.0" style="-fx-background-color: #A1C64F; -fx-background-radius: 20 20 20 20;">
+                        <AnchorPane layoutX="904.0" layoutY="56.0" prefHeight="481.0" prefWidth="316.0" style="-fx-background-color: #A1C64F; -fx-background-radius: 20 20 20 20;">
                            <children>
-                              <TextField fx:id="teacher_search_second1" disable="true" layoutX="136.0" layoutY="111.0" promptText="Enter second name" style="-fx-background-radius: 8 8 8 8;">
+                              <TextField fx:id="st_param_second" layoutX="136.0" layoutY="111.0" promptText="Enter second name" style="-fx-background-radius: 8 8 8 8;">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </TextField>
-                              <Label disable="true" layoutX="30.0" layoutY="111.0" prefHeight="29.0" prefWidth="96.0" text="SECOND NAME" />
-                              <TextField fx:id="teacher_search_middle1" disable="true" layoutX="136.0" layoutY="150.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
+                              <Label layoutX="30.0" layoutY="111.0" prefHeight="29.0" prefWidth="105.0" text="SECOND NAME" />
+                              <TextField fx:id="st_param_middle" layoutX="136.0" layoutY="150.0" promptText="Enter middle name" style="-fx-background-radius: 8 8 8 8;">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </TextField>
-                              <Label disable="true" layoutX="30.0" layoutY="156.0" text="MIDDLE NAME" />
+                              <Label layoutX="30.0" layoutY="156.0" text="MIDDLE NAME" />
                               <Label layoutX="35.0" layoutY="10.0" text="Parametr">
                                  <font>
                                     <Font name="System Bold" size="22.0" />
                                  </font>
                               </Label>
-                              <Button fx:id="btn_param_filter" layoutX="126.0" layoutY="484.0" mnemonicParsing="false" style="-fx-background-color: #E19133; -fx-background-radius: 10 10 10 10;" text="SEARCH">
+                              <Button fx:id="btn_param_filter" layoutX="117.0" layoutY="434.0" mnemonicParsing="false" style="-fx-background-color: #E19133; -fx-background-radius: 10 10 10 10;" text="SEARCH">
                                  <font>
                                     <Font name="Arial" size="15.0" />
                                  </font>
@@ -523,6 +523,12 @@
                                  </font>
                               </TextField>
                               <Label layoutX="29.0" layoutY="376.0" prefHeight="29.0" prefWidth="96.0" text="YEAR TO" />
+                              <TextField fx:id="st_param_first" layoutX="135.0" layoutY="73.0" promptText="Enter first name" style="-fx-background-radius: 8 8 8 8;">
+                                 <font>
+                                    <Font size="13.0" />
+                                 </font>
+                              </TextField>
+                              <Label layoutX="29.0" layoutY="73.0" prefHeight="29.0" prefWidth="105.0" text="FIRST NAME" />
                            </children>
                         </AnchorPane>
                         <Button fx:id="btn_subjects_clean" layoutX="339.0" layoutY="566.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="99.0" text="REFRESH">

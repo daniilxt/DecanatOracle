@@ -401,7 +401,6 @@ object Utils {
         connection: Connection,
         gr: String,
         sb: String,
-        teacher: String,
         from: String,
         to: String
     ): List<Statistics>? {
@@ -422,7 +421,7 @@ object Utils {
                 "    and sb_name like'%${sb}%'\n" +
                 "group by marks_sb.year,  marks_sb.sb_name,gr_name\n" +
                 "order by year\n"
-        println(sql)
+        // println(sql)
         try {
             val resultSet = connection.createStatement().executeQuery(sql)
             return if (!resultSet.next()) {
@@ -434,6 +433,57 @@ object Utils {
                         subject = resultSet.getString(2),
                         avg = resultSet.getString(3),
                         group = resultSet.getString(4)
+                    )
+                }
+            }
+        } catch (ex: SQLException) {
+            println(ex)
+        }
+        return null
+    }
+
+    fun getFilteredStatisticsByTeacher(
+        connection: Connection,
+        teacher: String,
+        first: String,
+        secondName: String,
+        middle: String
+    ): List<Statistics>? {
+        val student = if (secondName.isNotBlank() || first.isNotBlank() || middle.isNotBlank()) {
+            "${secondName} ${first} ${middle}".trim()
+        } else {
+            ""
+        }
+        println("Student is \n${student}")
+        val sql = "\n" +
+                "with marks_sb as (\n" +
+                "    select substr(gr.name, -4, 4) as year, s.name as sb_name, mk.value as mk_value\n" +
+                "    from marks mk\n" +
+                "             inner join people p on mk.teacher_id = p.id\n" +
+                "             inner join people st on mk.student_id = st.id\n" +
+                "             inner join groups gr on st.group_id = gr.id\n" +
+                "             inner join subjects s on mk.subject_id = s.id\n" +
+                "    where (lower(p.last_name) || ' ' || lower(p.first_name) || ' ' || " +
+                "lower(p.pather_name)) like lower('%${teacher}%')\n" +
+                "    and (lower(st.last_name) || ' ' || lower(st.first_name) || ' ' || " +
+                "lower(st.pather_name)) like lower('%$student%')\n" +
+                "    order by year)\n" +
+                "\n" +
+                "select marks_sb.year, marks_sb.sb_name, avg(marks_sb.mk_value) as avg\n" +
+                "from marks_sb\n" +
+                "group by marks_sb.year, marks_sb.sb_name\n" +
+                "order by year"
+        print(sql)
+        try {
+            val resultSet = connection.createStatement().executeQuery(sql)
+            return if (!resultSet.next()) {
+                null
+            } else {
+                getFromResultSet(resultSet) {
+                    Statistics(
+                        year = resultSet.getString(1),
+                        subject = resultSet.getString(2),
+                        avg = resultSet.getString(3)
                     )
                 }
             }
@@ -458,4 +508,6 @@ object Utils {
         } while (resultSet.next())
         return records
     }
+
+
 }

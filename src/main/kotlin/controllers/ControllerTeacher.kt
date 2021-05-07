@@ -339,6 +339,15 @@ class ControllerTeacher {
     private var reg_subject_name: TextField? = null
 
     @FXML
+    private var st_param_first: TextField? = null
+
+    @FXML
+    private var st_param_second: TextField? = null
+
+    @FXML
+    private var st_param_middle: TextField? = null
+
+    @FXML
     private fun alert(str: String = "Incorrect input", type: Alert.AlertType = Alert.AlertType.ERROR) {
         val alert = Alert(type)
         alert.title = "Attention"
@@ -635,36 +644,61 @@ class ControllerTeacher {
             if (!subject_param_from?.text.isNullOrBlank() || !subject_param_to?.text.isNullOrBlank() ||
                 switch_param_group?.value != null || switch_param_subject?.value != null || switch_param_teacher?.value != null
             ) {
-                tableStatisticFiller(
-                    Utils.getFilteredStatistics(
-                        connection,
-                        if (switch_param_group?.value != null) {
-                            switch_param_group?.value.toString()
-                        } else {
-                            ""
-                        },
-                        if (switch_param_subject?.value != null) {
-                            switch_param_subject?.value.toString()
-                        } else {
-                            ""
-                        },
-                        if (switch_param_teacher?.value != null) {
-                            switch_param_teacher?.value.toString()
-                        } else {
-                            ""
-                        },
-                        if (!subject_param_from?.text.isNullOrBlank()) {
-                            subject_param_from!!.text
-                        } else {
-                            "0"
-                        },
-                        if (!subject_param_to?.text.isNullOrBlank()) {
-                            subject_param_to!!.text
-                        } else {
-                            "3000"
-                        }
+                if (!switch_param_teacher?.value.isNullOrBlank() || !st_param_first?.text.isNullOrBlank() ||
+                    !st_param_second?.text.isNullOrBlank() || !st_param_middle?.text.isNullOrBlank()
+                ) {
+                    tableStatisticFiller(
+                        Utils.getFilteredStatisticsByTeacher(
+                            connection,
+                            if (switch_param_teacher?.value != null) {
+                                switch_param_teacher?.value.toString()
+                            } else {
+                                ""
+                            },
+                            if (!st_param_first?.text.isNullOrBlank()) {
+                                st_param_first!!.text
+                            } else {
+                                ""
+                            },
+                            if (!st_param_second?.text.isNullOrBlank()) {
+                                st_param_second!!.text
+                            } else {
+                                ""
+                            },
+                            if (!st_param_middle?.text.isNullOrBlank()) {
+                                st_param_middle!!.text
+                            } else {
+                                ""
+                            }
+                        )
                     )
-                )
+                } else {
+                    tableStatisticFiller(
+                        Utils.getFilteredStatistics(
+                            connection,
+                            if (switch_param_group?.value != null) {
+                                switch_param_group?.value.toString()
+                            } else {
+                                ""
+                            },
+                            if (switch_param_subject?.value != null) {
+                                switch_param_subject?.value.toString()
+                            } else {
+                                ""
+                            },
+                            if (!subject_param_from?.text.isNullOrBlank()) {
+                                subject_param_from!!.text
+                            } else {
+                                "0"
+                            },
+                            if (!subject_param_to?.text.isNullOrBlank()) {
+                                subject_param_to!!.text
+                            } else {
+                                "3000"
+                            }
+                        )
+                    )
+                }
             }
         }
         btn_subjects_clean?.setOnAction {
