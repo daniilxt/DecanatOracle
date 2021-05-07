@@ -443,6 +443,12 @@ object Utils {
         return null
     }
 
+    fun createSubject(connection: Connection, name: String): Boolean {
+        val sql = "INSERT INTO SUBJECTS (NAME)\n" +
+                "VALUES ('${name}')"
+        return (doSomethingWithResult(connection, sql))
+    }
+
     @Throws(SQLException::class)
     private fun <T> getFromResultSet(resultSet: ResultSet, action: () -> T): List<T>? {
         val records: MutableList<T> = ArrayList()

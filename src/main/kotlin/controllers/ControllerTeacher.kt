@@ -8,6 +8,7 @@ import javafx.fxml.FXML
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.util.Callback
+import jdk.jshell.execution.Util
 import poko.*
 import java.sql.Connection
 
@@ -298,6 +299,17 @@ class ControllerTeacher {
     @FXML
     private var table_stat_group: TableColumn<Statistics, String>? = null
 
+    @FXML
+    private var table_subjects: TableView<Subject>? = null
+
+    @FXML
+    private var table_subjects_name: TableColumn<Subject, String>? = null
+
+    @FXML
+    private var btn_reg_subject: Button? = null
+
+    @FXML
+    private var reg_subject_name: TextField? = null
 
     @FXML
     private fun alert(str: String = "Incorrect input", type: Alert.AlertType = Alert.AlertType.ERROR) {
@@ -631,6 +643,19 @@ class ControllerTeacher {
         btn_subjects_clean?.setOnAction {
             tableStatisticFiller(Utils.getStatisticsList(connection))
         }
+
+        btn_reg_subject?.setOnAction {
+            if (!reg_subject_name?.text.isNullOrBlank()) {
+                if (Utils.createSubject(connection, reg_subject_name!!.text)) {
+                    alert("SUCCESS", Alert.AlertType.CONFIRMATION)
+                    tableSubjectsFiller(Utils.getSubjectList(connection))
+                } else {
+                    alert("ERROR")
+                }
+            } else {
+                alert("Fill all fields")
+            }
+        }
     }
 
     private fun moveButtons(connection: Connection) {
@@ -664,6 +689,9 @@ class ControllerTeacher {
 
         tableStatistic(connection)
         tableStatisticFiller(Utils.getStatisticsList(connection))
+
+        tableSubjects(connection)
+        tableSubjectsFiller(Utils.getSubjectList(connection))
 
         table_teacher_sb_name_teacher?.cellValueFactory = PropertyValueFactory("secondName")
         table_teacher_sb_group?.cellValueFactory = PropertyValueFactory("groupName")
@@ -850,13 +878,6 @@ class ControllerTeacher {
     }
 
     /*PEOPLE IN GROUP---------------------------------------------------------------*/
-    fun onTeacherAction(actionEvent: ActionEvent) {
-
-    }
-
-    fun onExitAction(actionEvent: ActionEvent) {
-
-    }
 
     /*MARKS LIST--------------------------------------------------------------------*/
 
@@ -876,12 +897,39 @@ class ControllerTeacher {
             table_stat?.items?.addAll(data)
         }
     }
+    /*STAT LIST--------------------------------------------------------------------*/
+    /*Subjects LIST--------------------------------------------------------------------*/
+
+
+    private fun tableSubjects(connection: Connection) {
+        table_subjects_name?.cellValueFactory = PropertyValueFactory("name")
+        table_subjects?.columns?.add(addButtonColumn("Action", "delete") {
+            println("Deleted sb  ${it.idSubject}")
+        })
+    }
+
+    private fun tableSubjectsFiller(data: List<Subject>?) {
+        table_subjects?.items?.clear()
+        if (data != null) {
+            table_subjects?.items?.addAll(data)
+
+        }
+    }
+    /*subjects LIST--------------------------------------------------------------------*/
 
     fun onGroupsAction(actionEvent: ActionEvent) {
 
     }
 
     fun onMarksAction(actionEvent: ActionEvent) {
+
+    }
+
+    fun onTeacherAction(actionEvent: ActionEvent) {
+
+    }
+
+    fun onExitAction(actionEvent: ActionEvent) {
 
     }
 
