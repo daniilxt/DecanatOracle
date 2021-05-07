@@ -18,7 +18,22 @@ class ControllerTeacher {
     private var tab_loader: TabPane? = null
 
     @FXML
-    private var tab_manager: Tab? = null
+    private var tab_main: Tab? = null
+
+    @FXML
+    private var tab_group: Tab? = null
+
+    @FXML
+    private var tab_teachers: Tab? = null
+
+    @FXML
+    private var tab_statistics: Tab? = null
+
+    @FXML
+    private var tab_subjects: Tab? = null
+
+    @FXML
+    private var tab_marks: Tab? = null
 
     @FXML
     private var main_btn_teachers: Button? = null
@@ -31,6 +46,12 @@ class ControllerTeacher {
 
     @FXML
     private var main_btn_marks: Button? = null
+
+    @FXML
+    private var main_btn_statistics: Button? = null
+
+    @FXML
+    private var main_btn_subjects: Button? = null
 
     @FXML
     private var tab_alc: Tab? = null
@@ -94,6 +115,12 @@ class ControllerTeacher {
 
     @FXML
     private var btn_back_gr: Button? = null
+
+    @FXML
+    private var btn_back_sttatistics: Button? = null
+
+    @FXML
+    private var btn_back_subject: Button? = null
 
     @FXML
     private var tab_task: Tab? = null
@@ -660,13 +687,32 @@ class ControllerTeacher {
 
     private fun moveButtons(connection: Connection) {
         btn_back_mk?.setOnAction {
-            println("BACK FROM MK")
+            tab_loader!!.selectionModel!!.select(tab_main)
         }
 
         btn_teacher_back?.setOnAction {
-            println("PRESSED BACK")
+            tab_loader!!.selectionModel!!.select(tab_main)
+
         }
+        btn_back_gr?.setOnAction {
+            tab_loader!!.selectionModel!!.select(tab_main)
+        }
+        btn_teacher_back?.setOnAction {
+            tab_loader!!.selectionModel!!.select(tab_main)
+        }
+        btn_back_sttatistics?.setOnAction {
+            tab_loader!!.selectionModel!!.select(tab_main)
+        }
+        btn_back_subject?.setOnAction {
+            tab_loader!!.selectionModel!!.select(tab_main)
+        }
+        main_btn_groups?.setOnAction { tab_loader!!.selectionModel!!.select(tab_group) }
+        main_btn_marks?.setOnAction { tab_loader!!.selectionModel!!.select(tab_marks) }
+        main_btn_teachers?.setOnAction { tab_loader!!.selectionModel!!.select(tab_teachers) }
+        main_btn_statistics?.setOnAction { tab_loader!!.selectionModel!!.select(tab_statistics) }
+        main_btn_subjects?.setOnAction { tab_loader!!.selectionModel!!.select(tab_subjects) }
     }
+
 
     private fun createTeacher(connection: Connection, teacher: Teacher, action: (res: Boolean) -> Unit) {
         action(Utils.createTeacher(connection, teacher))
@@ -898,8 +944,8 @@ class ControllerTeacher {
         }
     }
     /*STAT LIST--------------------------------------------------------------------*/
-    /*Subjects LIST--------------------------------------------------------------------*/
 
+    /*Subjects LIST--------------------------------------------------------------------*/
 
     private fun tableSubjects(connection: Connection) {
         table_subjects_name?.cellValueFactory = PropertyValueFactory("name")
